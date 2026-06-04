@@ -1,0 +1,47 @@
+name: 'hasbro_principal_marketing_analytics_engineer_test'
+version: '1.0.0'
+config-version: 2
+
+profile: 'hasbro_marketing'
+
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+seeds:
+  hasbro_principal_marketing_analytics_engineer_test:
+    +quote_columns: false
+
+models:
+  hasbro_principal_marketing_analytics_engineer_test:
+    # Note: All layers are materialized as tables rather than views.
+    # SQLite does not support views that reference objects across schemas.
+    # In a production environment (Snowflake, BigQuery, Redshift), staging and
+    # intermediate models would be materialized as views for efficiency.
+    staging:
+      +materialized: table
+    intermediate:
+      +materialized: table
+    marts:
+      dimensions:
+        +materialized: table
+      facts:
+        +materialized: table
+    reporting:
+      +materialized: table
+
+vars:
+  # Baseline method preference order when multiple methods exist for same retailer/product
+  # Options: prior_8_weeks, prior_12_weeks, same_period_last_year, manual_override
+  default_baseline_method: 'prior_8_weeks'
+
+  # Attribution window to use for standardized ROAS reporting
+  # Other windows are preserved in fct_marketing_performance for full access
+  standard_attribution_window: '7d_click'

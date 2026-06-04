@@ -1,0 +1,149 @@
+version: 2
+
+models:
+  # ── Intermediate ──────────────────────────────────────────────────────────
+
+  - name: int_product_key_resolution
+    description: "Resolves product_id, SKU, and unknown keys to canonical product_id. All downstream models join here for product key resolution."
+    columns:
+      - name: raw_key
+        tests:
+          - unique
+          - not_null
+      - name: resolution_method
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['product_id_match', 'sku_match', 'unresolvable']
+
+  - name: int_funnel_event_mapping
+    description: "Maps platform-specific raw event names to canonical funnel stages and event types. AI-suggested mappings flagged requires_human_review = 1."
+    columns:
+      - name: event_id
+        tests:
+          - unique
+          - not_null
+
+  - name: int_date_spine
+    description: "Date dimension covering 2021-01-01 to 2024-12-31. Provides week_start_date for aligning daily and weekly grains."
+    columns:
+      - name: date_day
+        tests:
+          - unique
+          - not_null
+
+  # ── Dimensions ────────────────────────────────────────────────────────────
+
+  - name: dim_product
+    description: "Canonical product dimension. One row per product_id."
+    columns:
+      - name: product_id
+        tests:
+          - unique
+          - not_null
+
+  - name: dim_retailer
+    description: "Canonical retailer dimension. R006 preserved with dq_potential_duplicate_retailer flag pending business confirmation."
+    columns:
+      - name: retailer_id
+        tests:
+          - unique
+          - not_null
+
+  - name: dim_campaign
+    description: "Canonical campaign dimension with resolved product_id. Unresolvable product keys preserved with flag."
+    columns:
+      - name: campaign_id
+        tests:
+          - unique
+          - not_null
+
+  - name: dim_date
+    description: "Date dimension from int_date_spine."
+    columns:
+      - name: date_day
+        tests:
+          - unique
+          - not_null
+
+  # ── Facts ─────────────────────────────────────────────────────────────────
+
+  - name: fct_marketing_performance
+    description: >
+      Daily marketing performance fact. Grain: campaign_id + platform + activity_date + attribution_window.
+      Do not aggregate across attribution windows — this double-counts conversions.
+      Use is_standard_attribution_window = 1 for standardized ROAS reporting.
+    columns:
+      - name: performance_id
+        tests:
+          - unique
+          - not_null
+      - name: campaign_id
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_campaign')
+                field: campaign_id
+
+  - name: fct_funnel_performance
+    description: "Canonical funnel performance fact. Platform event names mapped to canonical stages. AI-suggested mappings flagged."
+    columns:
+      - name: event_id
+        tests:
+          - unique
+          - not_null
+
+  - name: fct_pos_weekly
+    description: >
+      Weekly POS performance fact. Grain: retailer_id + product_id + week_start_date.
+      Return/adjustment rows included but flagged is_return_adjustment = 1.
+      Exclude these for demand analysis. product_key resolved via int_product_key_resolution.
+    columns:
+      - name: pos_id
+        tests:
+          - unique
+          - not_null
+
+  - name: fct_pos_baseline
+    description: >
+      POS baseline fact. All baseline methods preserved — filter to preferred method
+      using is_preferred_method = 1 or baseline_method = var('default_baseline_method').
+    columns:
+      - name: baseline_id
+        tests:
+          - not_null
+
+  - name: fct_marketing_lift
+    description: >
+      Marketing lift fact. Grain: campaign_id + product_id + retailer_id + week_start_date.
+      Compares actual POS to baseline-expected performance during campaign exposure windows.
+      lift_confidence classifies each row as clean, confounded, incomplete, or unresolvable.
+      Use lift_confidence = 'clean' for defensible lift reporting.
+    columns:
+      - name: lift_confidence
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['clean', 'confounded', 'incomplete', 'unresolvable']
+
+  # ── Reporting ─────────────────────────────────────────────────────────────
+
+  - name: rpt_marketing_effectiveness
+    description: >
+      Unified marketing effectiveness view. Grain: campaign_id + product_id + retailer_id + week_start_date.
+      Connects campaigns, products, retailers, weekly spend, funnel events, POS actuals, and lift in one model.
+      Primary model for marketing performance reporting and executive summaries.
+
+  - name: mart_data_quality_summary
+    description: >
+      Queryable DQ flag summary across all staging and fact models.
+      One row per source_table + dq_flag combination where count > 0.
+      Use to monitor data quality and track issue resolution over time.
+    columns:
+      - name: source_table
+        tests:
+          - not_null
+      - name: dq_flag
+        tests:
+          - not_null

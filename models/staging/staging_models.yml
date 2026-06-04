@@ -1,0 +1,121 @@
+version: 2
+
+models:
+  - name: stg_products
+    description: "Normalized product reference data. P1002 deduplicated. product_status, SKU, and launch_date standardized."
+    columns:
+      - name: product_id
+        tests:
+          - unique
+          - not_null
+      - name: sku
+        tests:
+          - not_null
+      - name: product_status
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['Active', 'Discontinued', 'Inactive']
+
+  - name: stg_retailers
+    description: "Normalized retailer reference data. Tier, country, region, channel standardized. R006 flagged as potential duplicate."
+    columns:
+      - name: retailer_id
+        tests:
+          - unique
+          - not_null
+      - name: retailer_tier
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['Tier 1', 'Tier 2', 'Tier 3']
+              config:
+                severity: warn
+      - name: country
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['US']
+              config:
+                severity: warn
+
+  - name: stg_campaigns
+    description: "Normalized campaign metadata. Platform, funnel_stage, region standardized. Product key issues flagged."
+    columns:
+      - name: campaign_id
+        tests:
+          - unique
+          - not_null
+      - name: platform
+        tests:
+          - not_null
+
+  - name: stg_marketing_performance
+    description: "Normalized daily marketing performance. Spend cast to float. Currency and attribution_window standardized. MPDUP1 excluded."
+    columns:
+      - name: performance_id
+        tests:
+          - unique
+          - not_null
+      - name: campaign_id
+        tests:
+          - not_null
+      - name: currency
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['USD']
+      - name: attribution_window
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['1d_click', '7d_click', 'view_through_1d', 'platform_default']
+
+  - name: stg_funnel_events
+    description: "Normalized funnel events. Platform normalized. raw_event_count cast to int. 'unknown' set to NULL."
+    columns:
+      - name: event_id
+        tests:
+          - unique
+          - not_null
+      - name: campaign_id
+        tests:
+          - not_null
+
+  - name: stg_pos_weekly
+    description: "Normalized weekly POS data. retailer_id uppercased. promo_flag and on_hand_status normalized. Negative units and duplicate grain flagged."
+    columns:
+      - name: pos_id
+        tests:
+          - unique
+          - not_null
+      - name: on_hand_status
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['in_stock', 'out_of_stock', 'low_stock', 'unknown']
+
+  - name: stg_pos_baseline
+    description: "Normalized POS baseline history. avg_weekly_units cast to float. Duplicate baselines and mixed methods flagged."
+    columns:
+      - name: baseline_id
+        tests:
+          - not_null
+
+  - name: stg_promo_calendar
+    description: "Normalized promotion calendar. expected_discount_pct cast to float. Orphaned retailer R999 flagged."
+    columns:
+      - name: promo_id
+        tests:
+          - not_null
+
+  - name: stg_ai_taxonomy_suggestions
+    description: "AI taxonomy suggestions with approval status. Only is_approved = 1 rows should influence production models."
+    columns:
+      - name: suggestion_id
+        tests:
+          - unique
+          - not_null
+
+  - name: stg_taxonomy_lookup
+    description: "Unified taxonomy lookup combining raw table and seed supplement."

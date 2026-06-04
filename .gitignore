@@ -1,0 +1,26 @@
+# dbt artifacts
+target/
+dbt_packages/
+logs/
+
+# SQLite database — do not commit raw data
+*.sqlite
+*.db
+
+# dbt profiles — contains local paths, never commit
+profiles.yml
+.user.yml
+
+# Python
+__pycache__/
+*.pyc
+.env
+venv/
+.venv/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# VSCode
+.vscode/

@@ -1,0 +1,15 @@
+hasbro_marketing:
+  target: dev
+  outputs:
+    dev:
+      type: sqlite
+      threads: 1
+      # Set database to the name of your SQLite file (without extension)
+      database: "principal_marketing_analytics_engineer_test"
+      schema: main
+      schemas_and_paths:
+        # Update this path to wherever you saved the .sqlite file on your machine
+        # Mac example:     /Users/yourname/path/to/principal_marketing_analytics_engineer_test.sqlite
+        # Windows example: C:/Users/yourname/path/to/principal_marketing_analytics_engineer_test.sqlite
+        main: "/path/to/principal_marketing_analytics_engineer_test.sqlite"
+      schema_directory: "/path/to/project/schemas"

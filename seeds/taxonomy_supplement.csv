@@ -1,0 +1,22 @@
+taxonomy_type,raw_value,canonical_value,effective_start_date,source_system,confidence_score
+currency,US Dollars,USD,2024-01-01,seed,0.99
+currency,usd,USD,2024-01-01,seed,0.99
+currency,USD,USD,2024-01-01,seed,0.99
+region,NA,North America,2024-01-01,seed,0.90
+region,North America,North America,2024-01-01,seed,0.99
+region,US,North America,2024-01-01,seed,0.85
+on_hand_status,in_stock,in_stock,2024-01-01,seed,0.99
+on_hand_status,In Stock,in_stock,2024-01-01,seed,0.99
+on_hand_status,OOS,out_of_stock,2024-01-01,seed,0.99
+on_hand_status,low stock,low_stock,2024-01-01,seed,0.99
+on_hand_status,,unknown,2024-01-01,seed,0.80
+retailer_tier,Tier 1,Tier 1,2024-01-01,seed,0.99
+retailer_tier,Tier 2,Tier 2,2024-01-01,seed,0.99
+retailer_tier,Tier 3,Tier 3,2024-01-01,seed,0.99
+retailer_tier,tier1,Tier 1,2024-01-01,seed,0.99
+retailer_tier,Tier One,Tier 1,2024-01-01,seed,0.99
+attribution_window,1d_click,1d_click,2024-01-01,seed,0.99
+attribution_window,7-day click,7d_click,2024-01-01,seed,0.99
+attribution_window,7d_click,7d_click,2024-01-01,seed,0.99
+attribution_window,view_through_1d,view_through_1d,2024-01-01,seed,0.99
+attribution_window,platform_default,platform_default,2024-01-01,seed,0.80

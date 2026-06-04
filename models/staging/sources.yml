@@ -1,0 +1,27 @@
+version: 2
+
+sources:
+  - name: main
+    schema: main
+    description: "Raw source tables from the Hasbro marketing analytics assessment SQLite database."
+    tables:
+      - name: products_raw
+        description: "Raw product reference data."
+      - name: retailers_raw
+        description: "Raw retailer reference data."
+      - name: taxonomy_lookup_raw
+        description: "Manual taxonomy mapping table."
+      - name: marketing_campaigns_raw
+        description: "Campaign metadata."
+      - name: marketing_performance_raw
+        description: "Daily marketing performance."
+      - name: platform_funnel_events_raw
+        description: "Platform funnel event counts."
+      - name: retail_pos_weekly_raw
+        description: "Weekly POS data."
+      - name: promo_calendar_raw
+        description: "Retail promotion calendar."
+      - name: pos_baseline_history_raw
+        description: "Historical baseline sales."
+      - name: ai_taxonomy_suggestions_raw
+        description: "AI-generated taxonomy suggestions."
