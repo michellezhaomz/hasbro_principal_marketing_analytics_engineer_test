@@ -21,6 +21,16 @@ This document defines all canonical metrics used in this project. It is the cont
 | **CVR** | Conversion rate | `conversions / clicks` | |
 | **ROAS** | Return on ad spend | `revenue_attributed / spend` | **Always filter to a single attribution window** |
 
+### Treatment of Baseline Values
+
+Baseline values (`avg_weekly_units`, `avg_weekly_sales`) are treated as pre-computed business inputs rather than recalculated from raw transaction data. The source data provides the result of each baseline calculation alongside the method used, but does not include the underlying calculation logic or the historical transaction window that produced it.
+
+This means:
+- The lift model consumes baseline values as-is without attempting to verify or recreate them
+- Different methods (`prior_8_weeks`, `prior_12_weeks`, `same_period_last_year`, `manual_override`) may produce different expected values for the same retailer/product
+- The `baseline_method` column is always surfaced alongside lift metrics so analysts know which method was used
+- Cross-retailer lift comparisons should account for the fact that different retailers may use different baseline methods
+
 ### Attribution Window Policy
 
 **Standard reporting window: `7d_click`**

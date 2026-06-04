@@ -162,6 +162,7 @@ models/
 ## Risks & Limitations
 
 - **No experimental control group.** Lift is an observational pre/post comparison, not a causal estimate. Campaign exposure and retail promotions overlap, making clean causal attribution impossible without a holdout design.
+- **Baseline values are pre-computed inputs.** The dataset provides baseline averages alongside the method label but not the underlying calculation logic. Lift estimates are directional and depend on the accuracy of the upstream baseline calculation.
 - **Attribution windows differ across platforms.** `1d_click`, `7d_click`, and `view_through_1d` are not comparable. Cross-platform ROAS comparisons using mixed windows are misleading. Models enforce a single standard window for aggregated reporting; the full window breakdown remains available in `fct_marketing_performance`.
 - **R001/R006 retailer near-duplicate is unresolved.** If they are the same retailer, any lift or sales analysis that doesn't consolidate them understates performance at that retail account. Requires business confirmation before merging.
 - **P4040 is unresolvable.** CAMP007 and associated POS records cannot be joined to any product dimension. These records are quarantined and excluded from all lift analysis.

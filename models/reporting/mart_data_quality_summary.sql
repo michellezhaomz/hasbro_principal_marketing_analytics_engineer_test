@@ -62,8 +62,8 @@ dq_baseline as (
     select 'stg_pos_baseline', 'dq_duplicate_baseline', count(*)
     from {{ ref('stg_pos_baseline') }} where dq_duplicate_baseline = 1
     union all
-    select 'stg_pos_baseline', 'dq_multiple_baseline_methods', count(*)
-    from {{ ref('stg_pos_baseline') }} where dq_multiple_baseline_methods = 1
+    select 'stg_pos_baseline', 'has_multiple_baseline_methods', count(*)
+    from {{ ref('stg_pos_baseline') }} where has_multiple_baseline_methods = 1
     union all
     select 'stg_pos_baseline', 'dq_product_key_is_sku', count(*)
     from {{ ref('stg_pos_baseline') }} where dq_product_key_is_sku = 1

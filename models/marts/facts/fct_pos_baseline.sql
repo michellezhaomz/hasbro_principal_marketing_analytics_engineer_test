@@ -38,7 +38,7 @@ final as (
 
         b.dq_null_avg_units,
         b.dq_duplicate_baseline,
-        b.dq_multiple_baseline_methods,
+        b.has_multiple_baseline_methods,
         b.dq_product_key_is_sku
 
     from baseline b

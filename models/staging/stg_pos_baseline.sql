@@ -37,11 +37,23 @@ final as (
         end                                                         as avg_weekly_units,
 
         case
-            when avg_weekly_units = 'unknown' then 1
+            when avg_weekly_units = 'unknown' 
+            or avg_weekly_units is null
+            or trim(cast(avg_weekly_units as text)) = '' then 1
             else 0
         end                                                         as dq_null_avg_units,
 
-        cast(avg_weekly_sales as real)                              as avg_weekly_sales,
+        case
+            when avg_weekly_sales is null
+            or trim(cast(avg_weekly_sales as text)) = '' then null
+            else cast(avg_weekly_sales as real)
+        end                                                         as avg_weekly_sales,
+
+        case
+            when avg_weekly_sales is null
+            or trim(cast(avg_weekly_sales as text)) = '' then 1
+            else 0
+        end                                                         as dq_null_avg_sales, 
 
         baseline_method,
 
@@ -52,7 +64,7 @@ final as (
 
         -- Flag duplicate baseline_id
         case
-            when baseline_id = 'BLDUP' then 1
+            when count(*) over (partition by retailer_id, product_key, baseline_method) > 1 then 1
             else 0
         end                                                         as dq_duplicate_baseline,
 
@@ -66,7 +78,7 @@ final as (
                   and b2.product_key = raw.product_key
             ) > 1 then 1
             else 0
-        end                                                         as dq_multiple_baseline_methods
+        end                                                         as has_multiple_baseline_methods
 
     from raw
 )

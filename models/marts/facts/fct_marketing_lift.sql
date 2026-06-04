@@ -105,7 +105,7 @@ with_baseline as (
         b.baseline_method,
         b.seasonality_index,
         b.dq_null_avg_units,
-        b.dq_multiple_baseline_methods,
+        b.has_multiple_baseline_methods,
 
         -- Expected values: adjust baseline by seasonality
         case
@@ -198,7 +198,7 @@ final as (
         -- DQ flags
         dq_baseline_missing,
         dq_null_avg_units,
-        dq_multiple_baseline_methods,
+        has_multiple_baseline_methods,
         dq_orphaned_retailer_id,
         dq_orphaned_product_key
 

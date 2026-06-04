@@ -26,7 +26,9 @@ final as (
         end                                                         as expected_discount_pct,
 
         case
-            when expected_discount_pct = 'N/A' then 1
+            when expected_discount_pct = 'N/A' 
+            or expected_discount_pct is null
+            or trim(cast(expected_discount_pct as text)) = '' then 1
             else 0
         end                                                         as dq_null_discount_pct,
 
