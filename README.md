@@ -12,8 +12,8 @@ This project delivers a layered dbt architecture connecting Hasbro's marketing a
 - 2 reporting models: a unified effectiveness view and a queryable data quality summary
 
 **What was found in the data:**
-- 14 critical data quality issues affecting joins, taxonomy consistency, and lift calculations
-- 18 medium issues causing metric distortion if unhandled
+- The most significant data quality issues involved cross-system product resolution, attribution window fragmentation, taxonomy inconsistency, and lift measurement confounding from promotions and inventory conditions
+- Additional medium-priority issues that could affect metric consistency if left unstandardized
 - Preliminary lift signal is detectable for P1001 (Alpha Adventure Set) during CAMP001, but confounded at R001 by an overlapping retail promotion — R003 provides the cleaner measurement signal for the same campaign
 - Attribution window fragmentation across 5 variants means any ROAS figure that aggregates across windows overstates performance; the models enforce a single standard window for reporting
 
@@ -26,15 +26,19 @@ This project delivers a layered dbt architecture connecting Hasbro's marketing a
 
 ## Key Business Findings
 
-**Campaign activity ran March–June 2024** across 5 products and 4–6 retailers. Six campaigns generated ~$171K in tracked spend. CAMP007 (Legacy/PlatformX) has no resolvable product or spend data and is excluded from all performance analysis.
+The modeled data supports a directional read of marketing effectiveness across campaign performance, funnel activity, POS outcomes, and observed lift. Because the dataset does not include a randomized control group, the findings should be interpreted as observational rather than causal.
 
-**Top spend was CAMP005 (Instagram/Engagement, $34K) and CAMP003 (YouTube/Awareness, $30K).** CAMP006 (Meta Retargeting, $30K) generated the strongest attributed revenue relative to spend, consistent with retargeting efficiency patterns — retargeting campaigns reach consumers already in the consideration funnel, reducing conversion cost.
+**1. Campaign efficiency varied meaningfully by strategy and funnel stage.** CAMP005 and CAMP003 represented the highest spend campaigns, while CAMP006 generated the strongest attributed revenue relative to spend. CAMP006 is classified as a retargeting campaign in the conversion stage of the funnel. Its stronger efficiency is directionally consistent with retargeting behavior, where campaigns reach consumers who may already have demonstrated interest. This should be treated as a performance pattern rather than a causal conclusion.
 
-**POS volume is broadly consistent across the 5 products** (~8,400–8,850 clean units each over the period), but P1003 (Gamma Quest Game) and P1008 (Theta Mini Pack) lead on total sales value, suggesting higher price points or stronger retail placement rather than higher unit velocity.
+**2. Product and campaign mapping quality directly affects measurement.** The data uses different product identifiers across sources — product IDs, product keys, and SKUs — creating a join risk between campaign metadata, POS sales, and baseline history. A centralized product resolution layer is necessary before evaluating campaign outcomes. Without it, campaign performance could be disconnected from the correct POS records, resulting in incomplete or misleading lift estimates.
 
-**Lift for P1001 (CAMP001 / Meta Awareness, Mar 1–28):** Pre-campaign weekly average at R001 was approximately 44 units/week. During the campaign window, R001 ran ~171 units/week against a seasonality-adjusted baseline of ~50 units — a substantial positive lift signal. However, R001 had an active Feature promotion (PR001, 10% discount, Mar 11–24) overlapping the campaign window. **This lift cannot be cleanly attributed to the media campaign.** R003, which had no overlapping promotion during the same period, shows a cleaner lift signal and is the more defensible measurement retailer for CAMP001.
+**3. POS lift signals exist, but interpretation depends on promotion and inventory context.** Several campaign-product-retailer combinations show actual POS performance above expected baseline. However, some periods overlap with retail promotions or inventory constraints. When a campaign overlaps with a retailer promotion, observed lift may reflect a combination of marketing impact, promotional pricing, and baseline demand. Cleaner observations are separated from confounded ones using promotion, inventory, and baseline-quality flags.
 
-**Attribution window fragmentation is the most significant analytical risk in the performance data.** The same campaign has rows across `1d_click`, `7d_click`, and `view_through_1d` windows. Reporting ROAS without controlling for this overstates performance materially. The models enforce `7d_click` as the standard window for all aggregated reporting.
+**4. Attribution methodology is a major reporting risk.** The marketing performance data includes multiple attribution windows. Aggregating across them risks double-counting or overstating performance. The model preserves all raw attribution windows and uses a project-level standard window for aggregated reporting, allowing consistent campaign comparison while retaining source-level detail.
+
+**5. Taxonomy governance is required before this can scale.** Platform names, funnel events, campaign stages, regions, currencies, and inventory statuses all require standardization. The solution is a governed, version-controlled taxonomy layer that any team member can review and update through a standard approval process, rather than embedding business definitions in code where they become invisible to non-engineers.
+
+**6. AI can accelerate classification but should not replace business review.** AI taxonomy suggestions are useful for identifying likely mappings and duplicate entities. However, confidence scores should be treated as prioritization signals, not proof of correctness. Humans remain responsible for approving taxonomy changes, lift methodology assumptions, and business-critical metric definitions.
 
 ---
 
