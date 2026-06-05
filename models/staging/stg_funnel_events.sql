@@ -46,7 +46,9 @@ final as (
         end                                                         as event_count,
 
         case
-            when f.raw_event_count = 'unknown' then 1
+            when f.raw_event_count = 'unknown'
+              or f.raw_event_count is null
+              or trim(f.raw_event_count) = '' then 1
             else 0
         end                                                         as dq_null_event_count,
 

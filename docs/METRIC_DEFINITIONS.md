@@ -90,6 +90,7 @@ Platform event name mappings are maintained in `int_funnel_event_mapping`. See t
 | **Absolute Sales Lift** | Incremental sales above expected | `actual_sales − expected_sales` |
 | **Percent Sales Lift** | Lift as a proportion of expected sales | `(actual_sales − expected_sales) / expected_sales` |
 
+
 ### Lift Confidence Classification
 
 Every row in `fct_marketing_lift` carries a `lift_confidence` field:
@@ -102,6 +103,14 @@ Every row in `fct_marketing_lift` carries a `lift_confidence` field:
 | `unresolvable` | Product key or retailer key cannot be resolved | Exclude from all analysis |
 
 **Always filter to `lift_confidence = 'clean'` for any headline lift figure.** Report confounded weeks separately as a sensitivity range if needed.
+
+### Platform-Attributed Revenue vs POS Lift
+
+These are two different measurements and should not be conflated:
+- `revenue_attributed` in `fct_marketing_performance` is what the ad platform claims it influenced, based on click/view attribution windows. It is self-reported by the platform and subject to attribution window methodology.
+- `absolute_sales_lift` in `fct_marketing_lift` is the observed difference between actual retail POS sales and expected baseline sales. It is independent of platform reporting and reflects real units moving off shelves.
+
+A campaign can show strong platform-attributed revenue but weak POS lift (if the attributed conversions were people who would have bought anyway), or strong POS lift with modest platform-attributed revenue (if the campaign drove in-store sales not captured by digital tracking).
 
 ### Baseline Method Policy
 
